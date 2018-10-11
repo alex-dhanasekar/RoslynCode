@@ -42,7 +42,7 @@ namespace CodeChanger
                     var typeInfo = semanticModel.GetTypeInfo(memberAccessExpressions[i-1]).Type;
                     if (typeInfo != null && typeInfo.Name.Contains("Label"))
                     {
-                        Console.WriteLine(memberAccessExpressions[i].GetText());//afafqwf
+                        Console.WriteLine(memberAccessExpressions[i].GetText());//afafqwfWVWEVWEV
                         
                     }
                 }
