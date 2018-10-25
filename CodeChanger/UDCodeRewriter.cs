@@ -40,7 +40,8 @@ namespace CodeChanger
                     || typeInfo.Name.Contains("IntlPanel") || typeInfo.Name.Contains("Panel") || typeInfo.Name.Contains("IntlButton")
                     || typeInfo.Name.Contains("TextBox") || typeInfo.Name.Contains("UltraMaskedEdit")
                      ))|| memberAccessExpressions[i].GetLastToken().ToString()== "_pictureBox" || memberAccessExpressions[i].GetLastToken().ToString() == "_idLabel" 
-                       || memberAccessExpressions[i].GetLastToken().ToString() == "_nameLabel") 
+                       || memberAccessExpressions[i].GetLastToken().ToString() == "_nameLabel" 
+                       || memberAccessExpressions[i].GetLastToken().ToString() == "_nameTextBox") 
                     {
                         var rightExpression = " = UDThemeStyles.GenericBackColor";
                         if (node.Right.GetText().ToString().Contains("System.Drawing.Color.White"))
@@ -71,7 +72,7 @@ namespace CodeChanger
                             memberAccessExpressions[i].WithoutLeadingTrivia().GetText().ToString(), ".UseFlatMode  =  Infragistics.Win.DefaultableBoolean.True", ";\n\t\t\t",
                             memberAccessExpressions[i].WithoutLeadingTrivia().GetText().ToString(), ".UseOsThemes  =  Infragistics.Win.DefaultableBoolean.False");
                         }
-                        if (typeInfo.Name.Contains("IntlCurrencyEditor") || typeInfo.Name.Contains("TextBox"))  
+                        if (typeInfo.Name.Contains("IntlCurrencyEditor") || typeInfo.Name.Contains("TextBox") || memberAccessExpressions[i].GetLastToken().ToString() == "_nameTextBox")  
                         {
                             newExpressionString = string.Concat(newExpressionString, ";\n\t\t\t",
                             memberAccessExpressions[i].WithoutLeadingTrivia().GetText().ToString(), ".BorderStyle = BorderStyle.FixedSingle");
@@ -184,7 +185,8 @@ namespace CodeChanger
                 for (int i = 0; i < memberAccessExpressions.Count; i++)
                 {
                     var typeInfo = _semanticModel.GetTypeInfo(memberAccessExpressions[i]).Type;
-                    if (typeInfo != null && (typeInfo.Name.Contains("CursorAlignedMaskedEdit") || typeInfo.Name.Contains("LiveValidationEnforcementSpinner")))
+                    if ((typeInfo != null && (typeInfo.Name.Contains("CursorAlignedMaskedEdit") || typeInfo.Name.Contains("LiveValidationEnforcementSpinner")))
+                        || memberAccessExpressions[i].GetLastToken().ToString() == "_idTextBox")
                     {
                         var cursorAlignedMaskedEditNewExpression = string.Concat(node.GetText().ToString(), ";\n\t\t\t" +
                             memberAccessExpressions[i].WithoutLeadingTrivia().GetText().ToString() + "." + "UseFlatMode = " + "Infragistics.Win.DefaultableBoolean.True");

@@ -54,9 +54,10 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(24, 116);
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(-2, 114);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(70, 13);
+            this.label2.Size = new System.Drawing.Size(96, 18);
             this.label2.TabIndex = 1;
             this.label2.Text = "Solution Path";
             // 
@@ -91,9 +92,10 @@
             // 
             // InitiateRefreshButton
             // 
+            this.InitiateRefreshButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.InitiateRefreshButton.Location = new System.Drawing.Point(12, 774);
             this.InitiateRefreshButton.Name = "InitiateRefreshButton";
-            this.InitiateRefreshButton.Size = new System.Drawing.Size(938, 23);
+            this.InitiateRefreshButton.Size = new System.Drawing.Size(938, 32);
             this.InitiateRefreshButton.TabIndex = 4;
             this.InitiateRefreshButton.Text = "Initiate Refresh Process";
             this.InitiateRefreshButton.UseVisualStyleBackColor = true;
@@ -101,9 +103,10 @@
             // 
             // LoadCsharpFilesButton
             // 
+            this.LoadCsharpFilesButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LoadCsharpFilesButton.Location = new System.Drawing.Point(859, 111);
             this.LoadCsharpFilesButton.Name = "LoadCsharpFilesButton";
-            this.LoadCsharpFilesButton.Size = new System.Drawing.Size(91, 23);
+            this.LoadCsharpFilesButton.Size = new System.Drawing.Size(100, 26);
             this.LoadCsharpFilesButton.TabIndex = 6;
             this.LoadCsharpFilesButton.Text = "Load C# Files";
             this.LoadCsharpFilesButton.UseVisualStyleBackColor = true;
