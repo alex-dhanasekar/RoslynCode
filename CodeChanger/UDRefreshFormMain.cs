@@ -29,7 +29,9 @@ namespace CodeChanger
         protected void LoadSolutionDocuments()
         {
             string path = this.SolutionPathTextBox.Text;
+            //MSBuildLocator.RegisterMSBuildPath(@"C:\Program Files (x86)\MSBuild\15.0");
             MSBuildLocator.RegisterDefaults();
+            
             msbws = MSBuildWorkspace.Create();
             this.progressBarLabel.Text = "Initiating File load..";
             this.progressBar1.Value = 1;
@@ -78,7 +80,7 @@ namespace CodeChanger
                 var root = tree.GetRoot();
                 this.progressBar1.Value = ++counter;
                 var semanticModel = compilation.GetSemanticModel(tree);
-                SyntaxNode rootAfterReplacingNodes = new UDCodeRewriter(semanticModel, root).Visit(root);
+                SyntaxNode rootAfterReplacingNodes = new MethodVisitor(semanticModel, root).Visit(root);
                 document = document.WithText(rootAfterReplacingNodes.GetText());
                 project = document.Project;
                 //var result = msbws.TryApplyChanges(newDocumentAfterInsertingNodes.Project.Solution);

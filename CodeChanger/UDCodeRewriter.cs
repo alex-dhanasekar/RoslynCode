@@ -39,13 +39,13 @@ namespace CodeChanger
                     || typeInfo.Name.Contains("LiveValidationEnforcementSpinner")
                     || typeInfo.Name.Contains("IntlPanel") || typeInfo.Name.Contains("Panel") || typeInfo.Name.Contains("IntlButton")
                     || typeInfo.Name.Contains("TextBox") || typeInfo.Name.Contains("UltraMaskedEdit")
-                     ))|| memberAccessExpressions[i].GetLastToken().ToString()== "_pictureBox" || memberAccessExpressions[i].GetLastToken().ToString() == "_idLabel" 
-                       || memberAccessExpressions[i].GetLastToken().ToString() == "_nameLabel" 
-                       || memberAccessExpressions[i].GetLastToken().ToString() == "_nameTextBox") 
+                     )) || memberAccessExpressions[i].GetLastToken().ToString() == "_pictureBox" || memberAccessExpressions[i].GetLastToken().ToString() == "_idLabel"
+                       || memberAccessExpressions[i].GetLastToken().ToString() == "_nameLabel"
+                       || memberAccessExpressions[i].GetLastToken().ToString() == "_nameTextBox")
                     {
                         var rightExpression = " = UDThemeStyles.GenericBackColor";
-                        if (node.Right.GetText().ToString().Contains("System.Drawing.Color.White"))
-                            return node;
+                        //if (node.Right.GetText().ToString().Contains("System.Drawing.Color.White"))
+                        //    return node;
                         if (node.Right.GetText().ToString().Contains("System.Drawing.SystemColors.ControlLight"))
                         {
                             var newExpressionNode = SyntaxFactory.ParseExpression(node.GetLeadingTrivia().ToString() + node.Left.ToString() + rightExpression);
@@ -55,7 +55,7 @@ namespace CodeChanger
                         if (memberAccessExpressions[i].GetText().ToString().ToUpper().Contains("DIAMOND") || typeInfo.Name.Contains("UltraMaskedEdit"))
                             rightExpression = " = System.Drawing.Color.White";
                         var newExpressionString = node.GetLeadingTrivia().ToString() + node.Left.ToString() + rightExpression;
-                        if (typeInfo.Name == "IntlLabel" || typeInfo.Name == "IntlComboBox" 
+                        if (typeInfo.Name == "IntlLabel" || typeInfo.Name == "IntlComboBox"
                            || typeInfo.Name == "IntlButton")
                         {
                             newExpressionString = string.Concat(newExpressionString, ";\n\t\t\t",
@@ -72,7 +72,7 @@ namespace CodeChanger
                             memberAccessExpressions[i].WithoutLeadingTrivia().GetText().ToString(), ".UseFlatMode  =  Infragistics.Win.DefaultableBoolean.True", ";\n\t\t\t",
                             memberAccessExpressions[i].WithoutLeadingTrivia().GetText().ToString(), ".UseOsThemes  =  Infragistics.Win.DefaultableBoolean.False");
                         }
-                        if (typeInfo.Name.Contains("IntlCurrencyEditor") || typeInfo.Name.Contains("TextBox") || memberAccessExpressions[i].GetLastToken().ToString() == "_nameTextBox")  
+                        if (typeInfo.Name.Contains("IntlCurrencyEditor") || typeInfo.Name.Contains("TextBox") || memberAccessExpressions[i].GetLastToken().ToString() == "_nameTextBox")
                         {
                             newExpressionString = string.Concat(newExpressionString, ";\n\t\t\t",
                             memberAccessExpressions[i].WithoutLeadingTrivia().GetText().ToString(), ".BorderStyle = BorderStyle.FixedSingle");
@@ -82,7 +82,7 @@ namespace CodeChanger
                             newExpressionString = string.Concat(newExpressionString, ";\n\t\t\t",
                             memberAccessExpressions[i].WithoutLeadingTrivia().GetText().ToString(), ".BorderStyle = BorderStyle.None");
                         }
-                            if (typeInfo.Name.Contains("IntlRadioButton2") || typeInfo.Name.Contains("Panel") )
+                        if (typeInfo.Name.Contains("IntlRadioButton2") || typeInfo.Name.Contains("Panel"))
                         {
                             newExpressionString = string.Concat(newExpressionString, ";\n\t\t\t",
                             memberAccessExpressions[i].WithoutLeadingTrivia().GetText().ToString(), ".BorderStyle = BorderStyle.None");
@@ -124,7 +124,7 @@ namespace CodeChanger
                      || memberAccessExpressions[i].GetLastToken().ToString() == "_nameLabel")
                     {
                         var rightExpression = ".FlatStyle = FlatStyle.Flat";
-                        var newExpression = SyntaxFactory.ParseExpression("\t\t\t"+memberAccessExpressions[i].WithLeadingTrivia().GetText().ToString() + rightExpression);
+                        var newExpression = SyntaxFactory.ParseExpression("\t\t\t" + memberAccessExpressions[i].WithLeadingTrivia().GetText().ToString() + rightExpression);
                         return node.ReplaceNode(node, newExpression);
                     }
 
@@ -163,7 +163,7 @@ namespace CodeChanger
                 {
                     var typeInfo = _semanticModel.GetTypeInfo(memberAccessExpressions[i]).Type;
                     if (typeInfo != null && (typeInfo.Name.Contains("IntlRadioButton2") ||
-                       typeInfo.Name.Contains("IntlButton")
+                       (typeInfo.Name.Contains("IntlButton") && memberAccessExpressions[i].GetText().ToString().ToUpper().Contains("DIAMOND"))
                        ))
                     {
                         var foreColorRightExpression = string.Empty;
@@ -237,11 +237,65 @@ namespace CodeChanger
 
             if (node.GetText().ToString().Contains("ResumeLayout"))
             {
-                var expressionsToBeInserted = ";\n\t\t\t this.BackColor = UDThemeStyles.GenericBackColor;\n\t\t\t this.BorderStyle = BorderStyle.None";
-                var newExpressionNode = SyntaxFactory.ParseExpression(node.GetLeadingTrivia().ToString() + node.GetText().ToString() + expressionsToBeInserted);
+                var memberAccessExpressions = node.DescendantNodes().OfType<MemberAccessExpressionSyntax>().ToList();
+                string prevType = string.Empty;
+                for (int i = 0; i < memberAccessExpressions.Count; i++)
+                {
+                    var typeInfo = _semanticModel.GetTypeInfo(memberAccessExpressions[i]).Type;
+                    if (typeInfo != null && (typeInfo.Name.Contains("Panel") || typeInfo.Name.Contains("Form") || typeInfo.Name.Contains("DetailView")))
+                    {
+                        var expressionsToBeInserted = $";\n\t\t\t {memberAccessExpressions[i].GetText().ToString()}.BackColor = UDThemeStyles.GenericBackColor";
+                        if (typeInfo.Name.Contains("Panel"))
+                            expressionsToBeInserted += $";\n\t\t\t {memberAccessExpressions[i].GetText().ToString()}.BorderStyle = BorderStyle.None";
+                        var indentation = node.GetLeadingTrivia().ToString().Contains("\t") ? node.GetLeadingTrivia().ToString() : "\t\t\t";
+                        var newExpressionNode = SyntaxFactory.ParseExpression(indentation + node.GetText().ToString() + expressionsToBeInserted);
+                        return node.ReplaceNode(node, newExpressionNode);
+                    }
+                }
+
+            }
+            if (node.GetText().ToString().Contains("this.ResumeLayout(false)"))
+            {
+                var expressionsToBeInserted = ";\n\t\t\t this.BackColor = UDThemeStyles.GenericBackColor";
+                var indentation = node.GetLeadingTrivia().ToString().Contains("\t") ? node.GetLeadingTrivia().ToString() : "\t\t\t";
+                var newExpressionNode = SyntaxFactory.ParseExpression(indentation + node.GetText().ToString() + expressionsToBeInserted);
                 return node.ReplaceNode(node, newExpressionNode);
+
             }
             return node;
         }
+    }
+
+    public class MethodVisitor : CSharpSyntaxRewriter
+    {
+        private readonly SemanticModel _semanticModel;
+        SyntaxNode _node;
+        public MethodVisitor(SemanticModel model, SyntaxNode node)
+        {
+            _semanticModel = model;
+            _node = node;
+        }
+        public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
+        {
+
+            if (node.Identifier.ToString().Contains("InitializeComponent"))
+            {
+                SyntaxNode initializeComponentMethodNode = new UDCodeRewriter(_semanticModel, node).Visit(node);
+                return initializeComponentMethodNode;
+            }
+            return node;
+        }
+
+        public override SyntaxNode VisitAssignmentExpression(AssignmentExpressionSyntax node)
+        {
+            if (node.Left.GetLastToken().ToString().Contains("BackColor")  && node.Right.GetText().ToString().Contains("ControlLight"))
+            {
+                return node.ReplaceNode(node, node.WithRight(SyntaxFactory.ParseExpression("UDThemeStyles.GenericBackColor")));
+            }
+
+            return node;
+        }
+
+
     }
 }
